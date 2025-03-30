@@ -32,7 +32,7 @@ const Login = ({ defaultTab = 'login' }) => {
         e.preventDefault();
         try {
             if (activeTab === "login") {
-                const { data } = await axios.post("https://buzzard-popular-obviously.ngrok-free.app/api/auth/login", {
+                const { data } = await axios.post("https://scanforchange.onrender.com/api/auth/login", {
                     email: formData.email,
                     password: formData.password
                 });
@@ -44,7 +44,7 @@ const Login = ({ defaultTab = 'login' }) => {
                 if (formData.password !== formData.confirmPassword) {
                     return alert("Passwords do not match!");
                 }
-                await axios.post("https://buzzard-popular-obviously.ngrok-free.app/api/auth/signup", {
+                await axios.post("https://scanforchange.onrender.com/api/auth/signup", {
                     email: formData.email,
                     password: formData.password
                 });

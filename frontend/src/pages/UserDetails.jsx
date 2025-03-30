@@ -19,12 +19,15 @@ export default function UserDetails() {
         const { data } = await axios.get(
           "https://scanforchange.onrender.com/api/auth/profile",
           {
-            headers: { "x-auth-token": token },
+            headers: { 
+              "x-auth-token": token
+             },
           }
         );
 
+      console.log(userData);
+
         setUserData(data.data);
-        console.log(data.data); // Log after updating state
       } catch (err) {
         setError("Failed to fetch user data.");
       } finally {
@@ -49,23 +52,11 @@ export default function UserDetails() {
       <h2 className="text-xl font-semibold mt-4">Reports</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {userData.reports.map((report, index) => (
-          <div key={index} className="border p-4 rounded-md shadow-md">
-            <img
-              src={report.imgUrl}
-              alt="Reported Waste"
-              className="w-full h-40 object-cover rounded-md"
-            />
-            <p className="text-sm mt-2">
-              <span className="font-bold">Reported At:</span>{" "}
-              {new Date(report.reported_at).toLocaleString()}
-            </p>
-            <p className="text-sm">
-              <span className="font-bold">Points Earned:</span> {report.points_earned}
-            </p>
-            <p className="text-sm">
-              <span className="font-bold">Wastes Reported:</span>{" "}
-              {report.wastes_reported.join(", ")}
-            </p>
+          <div key={index} className="border p-4 rounded-md">
+            <img src={report.imgUrl} alt="Reported Waste" className="w-full h-40 object-cover rounded-md" />
+            <p className="text-sm mt-2">Reported At: {new Date(report.reported_at).toLocaleString()}</p>
+            <p className="text-sm">Points Earned: {report.points_earned}</p>
+            <p className="text-sm">Wastes Reported: {report.wastes_reported.join(", ")}</p>
           </div>
         ))}
       </div>

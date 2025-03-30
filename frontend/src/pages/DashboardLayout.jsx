@@ -6,19 +6,55 @@ import {
   User,
   LogOut,
 } from "lucide-react";
-import React, { useState, createContext } from "react";
+import React, { useState, createContext, useEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export const UserTokenContext = createContext();
+
 export default function DashboardLayout() {
-  const location = useLocation(); // Get current route
-  const navigate = useNavigate(); // For redirecting after logout
-  const [userTokens, setUserTokens] = useState(400);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [userData, setUserData] = useState(null);
+  const [userTokens, setUserTokens] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setError("User not logged in");
+          setIsLoading(false);
+          return;
+        }
+
+        const { data } = await axios.get(
+          "https://scanforchange.onrender.com/api/auth/profile",
+          {
+            headers: {
+              "x-auth-token": token
+            },
+          }
+        );
+
+        setUserData(data.data);
+        console.log(userData);
+      } catch (err) {
+        setError("Failed to fetch user data.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   // Logout function
   const handleLogout = () => {
-    localStorage.removeItem("token"); // Clear token
-    navigate("/login"); // Redirect to login page
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
   const tabs = [
@@ -50,11 +86,10 @@ export default function DashboardLayout() {
               <li key={tab.id} className="mb-5 md:mb-5">
                 <Link
                   to={tab.link}
-                  className={`flex items-center gap-2 p-2 rounded-sm ${
-                    location.pathname === tab.link
-                      ? "bg-green-500 text-white"
-                      : "hover:bg-gray-200"
-                  }`}
+                  className={`flex items-center gap-2 p-2 rounded-sm ${location.pathname === tab.link
+                    ? "bg-green-500 text-white"
+                    : "hover:bg-gray-200"
+                    }`}
                 >
                   <tab.icon className="text-xl" />
                   <span className="md:block hidden">{tab.title}</span>
@@ -65,27 +100,37 @@ export default function DashboardLayout() {
         </div>
 
         {/* Main Content */}
-
-        <UserTokenContext.Provider value={{ userTokens, setUserTokens }}>
+        <UserTokenContext.Provider value={{ userData }}>
           <div className="flex-1 pb-30">
             <div className="grid grid-cols-3 mt-5 gap-6">
-              <div className="bg-gray-200 rounded-sm p-5">
-                <h2 className="text-sm font-semibold">Earned Tokens</h2>
-                <span className="text-xl font-bold">{userTokens}</span>
-              </div>
-              <div className="bg-gray-200 rounded-sm p-5">
-                <h2 className="text-sm font-semibold">Items Scanned</h2>
-                <span className="text-xl font-bold">100</span>
-              </div>
-              <div className="bg-gray-200 rounded-sm p-5">
-                <h2 className="text-sm font-semibold">Rank</h2>
-                <span className="text-xl font-bold">10</span>
-              </div>
+              {isLoading ? (
+                <span className="text-xl font-bold">Loading...</span>
+              ) : error ? (
+                <span className="text-xl font-bold text-red-500">{error}</span>
+              ) : (
+                <>
+                  <div className="bg-gray-200 rounded-sm p-5">
+                    <h2 className="text-sm font-semibold">Earned Tokens</h2>
+                    <span className="text-xl font-bold">{userData.points}</span>
+                  </div>
+
+                  <div className="bg-gray-200 rounded-sm p-5">
+                    <h2 className="text-sm font-semibold">Scan Count</h2>
+                    <span className="text-xl font-bold">{userData.reports.length}</span>
+                  </div>
+
+                  <div className="bg-gray-200 rounded-sm p-5">
+                    <h2 className="text-sm font-semibold">Rank</h2>
+                    <span className="text-xl font-bold">{userData.rank}</span>
+                  </div>
+                </>
+              )}
             </div>
+
             <Outlet />
           </div>
-        </UserTokenContext.Provider>
-      </div>
-    </div>
+        </UserTokenContext.Provider >
+      </div >
+    </div >
   );
 }

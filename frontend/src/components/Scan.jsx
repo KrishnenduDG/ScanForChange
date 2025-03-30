@@ -32,7 +32,7 @@ export default function Scan() {
     try {
       // **Step 1: Upload Image**
       const uploadResponse = await axios.post(
-        "https://buzzard-popular-obviously.ngrok-free.app/api/utils/upload-image",
+        "https://scanforchange.onrender.com/api/utils/upload-image",
         formData,
         {
           headers: {
@@ -71,7 +71,7 @@ export default function Scan() {
 
     try {
       const response = await axios.post(
-        "https://buzzard-popular-obviously.ngrok-free.app/api/waste/register",
+        "https://scanforchange.onrender.com/api/waste/register",
         payload,
         {
           headers: {
@@ -167,6 +167,10 @@ export default function Scan() {
                 ))}
               </ul>
             </div>
+          )}
+
+          {waste.points > 0 && (
+            <p>Total earned points : {waste.points}</p>
           )}
         </div>
       )}

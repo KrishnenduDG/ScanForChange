@@ -5,7 +5,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://buzzard-popular-obviously.ngrok-free.app",
+        target: "https://scanforchange.onrender.com",
         changeOrigin: true,
         secure: false,
       },

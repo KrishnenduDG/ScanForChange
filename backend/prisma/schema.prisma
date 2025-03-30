@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model role {
+  id_pk Int    @unique @default(autoincrement())
+  name  String
+  user  user[]
+}
+
+model user {
+  id_pk         Int             @unique @default(autoincrement())
+  uid           String          @unique @default(uuid())
+  email         String          @unique
+  password      String
+  Role          role            @relation(references: [id_pk], fields: [roleId])
+  roleId        Int
+  joinedAt      DateTime        @default(now())
+  total_points  Int             @default(0)
+  waste_reports waste_reports[]
+}
+
+model waste_categories {
+  id_pk                     Int                         @unique @default(autoincrement())
+  name                      String
+  description               String
+  points                    Int
+  waste_report_category_map waste_report_category_map[]
+}
+
+model waste_reports {
+  id_pk         Int      @unique @default(autoincrement())
+  rid           String   @unique @default(uuid())
+  imgUrl        String
+  location      Int[]
+  reported_at   DateTime @default(now())
+  points_earned Int
+
+  User   user @relation(references: [id_pk], fields: [userId])
+  userId Int
+
+  wastes_reported           String[]
+  waste_report_category_map waste_report_category_map[]
+}
+
+model waste_report_category_map {
+  id_pk Int @unique @default(autoincrement())
+
+  Report        waste_reports @relation(references: [id_pk], fields: [wasteReportId])
+  wasteReportId Int
+
+  Category        waste_categories @relation(references: [id_pk], fields: [wasteCategoryId])
+  wasteCategoryId Int
+}
